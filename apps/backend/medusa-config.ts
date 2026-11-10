@@ -9,7 +9,7 @@ module.exports = defineConfig({
         // Medusa can invoke this callback more than once in development. Keep
         // one instance of each named Vite plugin so React Refresh is injected
         // only once into custom Admin routes.
-        return index === all.findIndex((candidate) => candidate?.name === plugin?.name)
+        return Boolean(plugin?.name) && index === all.findIndex((candidate) => candidate?.name === plugin?.name)
       })
 
       return {
@@ -78,10 +78,10 @@ module.exports = defineConfig({
         ...config.server,
         host: '0.0.0.0',
         allowedHosts: ['localhost', '.localhost', '127.0.0.1'],
-        hmr: {
-          port: 5173,
-          clientPort: 5173,
-        },
+        // Medusa's Admin bundler currently injects React Refresh twice for
+        // custom TSX routes in this setup. Disable dev HMR until that upstream
+        // collision is resolved; the Admin itself remains available on 9000.
+        hmr: false,
       },
       }
     },
