@@ -16,4 +16,4 @@ RUN ln -s /app/apps /apps
 ENV NODE_ENV=production
 EXPOSE 9000
 EXPOSE 5173
-CMD ["npm", "run", "start", "--workspace=@dtc/backend"]
+CMD ["npm", "run", "dev", "--workspace=@dtc/backend"]

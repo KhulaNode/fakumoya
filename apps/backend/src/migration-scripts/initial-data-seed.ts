@@ -36,7 +36,7 @@ export default async function initial_data_seed({
     ModuleRegistrationName.FULFILLMENT
   );
 
-  const countries = ["za"];
+  const countries = ["gb", "de", "dk", "se", "fr", "es", "it"];
 
   logger.info("Seeding store data...");
   const {
@@ -82,7 +82,7 @@ export default async function initial_data_seed({
           name: "Default Store",
           supported_currencies: [
             {
-              currency_code: "zar",
+              currency_code: "eur",
               is_default: true,
             },
             {
@@ -101,8 +101,8 @@ export default async function initial_data_seed({
     input: {
       regions: [
         {
-          name: "South Africa",
-          currency_code: "zar",
+          name: "Europe",
+          currency_code: "eur",
           countries,
           payment_providers: ["pp_system_default"],
           metadata: DEFAULT_REGION_STORE_POLICIES,
@@ -129,10 +129,10 @@ export default async function initial_data_seed({
     input: {
       locations: [
         {
-          name: "Fakumoya Bakery",
+          name: "European Warehouse",
           address: {
-            city: "Polokwane",
-            country_code: "ZA",
+            city: "Copenhagen",
+            country_code: "DK",
             address_1: "",
           },
         },
@@ -159,14 +159,38 @@ export default async function initial_data_seed({
   const shippingProfile = shippingProfileResult[0];
 
   const fulfillmentSet = await fulfillmentModuleService.createFulfillmentSets({
-    name: "Seshego delivery",
+    name: "European Warehouse delivery",
     type: "shipping",
     service_zones: [
       {
-        name: "Limpopo",
+        name: "Europe",
         geo_zones: [
           {
-            country_code: "za",
+            country_code: "gb",
+            type: "country",
+          },
+          {
+            country_code: "de",
+            type: "country",
+          },
+          {
+            country_code: "dk",
+            type: "country",
+          },
+          {
+            country_code: "se",
+            type: "country",
+          },
+          {
+            country_code: "fr",
+            type: "country",
+          },
+          {
+            country_code: "es",
+            type: "country",
+          },
+          {
+            country_code: "it",
             type: "country",
           },
         ],
