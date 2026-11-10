@@ -87,5 +87,25 @@ module.exports = defineConfig({
       jwtSecret: process.env.JWT_SECRET,
       cookieSecret: process.env.COOKIE_SECRET,
     }
-  }
+  },
+  modules: [
+    {
+      resolve: "@medusajs/medusa/payment",
+      options: {
+        providers: [
+          {
+            resolve: "./src/modules/paystack",
+            id: "paystack",
+            options: {
+              secret_key: process.env.PAYSTACK_SECRET_KEY,
+              storefront_url: process.env.STOREFRONT_URL,
+              bakery_subaccount_code: process.env.PAYSTACK_BAKERY_SUBACCOUNT_CODE,
+              revenue_share_secret: process.env.PAYSTACK_REVENUE_SHARE_SECRET,
+            },
+          },
+        ],
+      },
+    },
+    { resolve: "./src/modules/fakumoya-subscription" },
+  ],
 })

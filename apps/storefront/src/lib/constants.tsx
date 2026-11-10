@@ -29,6 +29,10 @@ export const paymentInfoMap: Record<
     title: "Manual Payment",
     icon: <CreditCard />,
   },
+  pp_paystack_paystack: {
+    title: "Pay securely with Paystack",
+    icon: <CreditCard />,
+  },
   // Add more payment providers here
 }
 
@@ -99,6 +103,7 @@ export const isStripeLike = (providerId?: string) => {
 export const isPaypal = (providerId?: string) => {
   return providerId?.startsWith("pp_paypal")
 }
+export const isPaystack = (providerId?: string) => providerId === "pp_paystack_paystack"
 export const isManual = (providerId?: string) => {
   return providerId?.startsWith("pp_system_default")
 }

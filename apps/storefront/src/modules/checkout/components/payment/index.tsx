@@ -1,7 +1,7 @@
 "use client"
 import { RadioGroup } from "@headlessui/react"
-import { getPaymentInfo, isStripeLike } from "@lib/constants"
-import { initiatePaymentSession } from "@lib/data/cart"
+import { getPaymentInfo, isPaystack, isStripeLike } from "@lib/constants"
+import { initiatePaymentSession, startPaystackCheckout } from "@lib/data/cart"
 import { CheckCircleSolid, CreditCard } from "@medusajs/icons"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import PaymentContainer, {
@@ -79,6 +79,11 @@ const Payment = ({
   const handleSubmit = async () => {
     setIsLoading(true)
     try {
+      if (isPaystack(selectedPaymentMethod)) {
+        const authorizationUrl = await startPaystackCheckout(cart)
+        window.location.assign(authorizationUrl)
+        return
+      }
       const shouldInputPaymentDetails =
         isStripeLike(selectedPaymentMethod) && !activeSession
 
@@ -197,7 +202,9 @@ const Payment = ({
             }
             data-testid="submit-payment-button"
           >
-            {!activeSession && isStripeLike(selectedPaymentMethod)
+            {isPaystack(selectedPaymentMethod)
+              ? "Continue to Paystack"
+              : !activeSession && isStripeLike(selectedPaymentMethod)
               ? "Enter payment details"
               : "Continue to review"}
           </Button>

@@ -6,6 +6,11 @@ export default defineMiddlewares({
   routes: [
     {
       method: ['POST'],
+      matcher: '/hooks/paystack/subscriptions',
+      bodyParser: { preserveRawBody: true },
+    },
+    {
+      method: ['POST'],
       matcher: '/store/search',
       middlewares: [
         configureStoreSearch({

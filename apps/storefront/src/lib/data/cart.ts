@@ -255,6 +255,39 @@ export async function initiatePaymentSession(
     .catch(medusaError)
 }
 
+/** Prepares a server-signed commission and opens Paystack's hosted checkout. */
+export async function startPaystackCheckout(cart: HttpTypes.StoreCart) {
+  const headers = { ...(await getAuthHeaders()) }
+  const prepared = await sdk.client.fetch<{
+    commission_token: string
+  }>("/store/fakumoya/paystack/prepare", {
+    method: "POST",
+    body: { cart_id: cart.id },
+    headers,
+    cache: "no-store",
+  }).catch(medusaError)
+
+  const result = await sdk.store.payment
+    .initiatePaymentSession(cart, {
+      provider_id: "pp_paystack_paystack",
+      data: {
+        cart_id: cart.id,
+        email: cart.email,
+        commission_token: prepared.commission_token,
+      },
+    }, {}, headers)
+    .catch(medusaError)
+
+  const session = result.payment_collection?.payment_sessions?.find(
+    (candidate: any) => candidate.provider_id === "pp_paystack_paystack"
+  )
+  const authorizationUrl = (session?.data as Record<string, unknown> | undefined)?.authorization_url
+  if (typeof authorizationUrl !== "string") {
+    throw new Error("Paystack checkout could not be started. Please try again.")
+  }
+  return authorizationUrl
+}
+
 export async function applyPromotions(codes: string[]) {
   const cartId = await getCartId()
 
