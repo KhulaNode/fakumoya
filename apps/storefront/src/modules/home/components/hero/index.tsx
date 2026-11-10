@@ -11,15 +11,15 @@ const Hero = () => {
             Seshego · Est. 2016
           </p>
           <h1 className="brand-heading text-5xl leading-[1.03] text-brand-secondary xsmall:text-6xl medium:text-7xl">
-            Fresh Bread Delivered to Your Door.
+            Fresh borotho, straight to your door.
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-8 text-[#68503b]">
-            Freshly baked bread and neighbourhood favourites, made with care
-            in Seshego, Polokwane.
+            Freshly baked bread and kasi favourites, made with care in Seshego,
+            Polokwane.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <LocalizedClientLink href="/store">
-              <Button size="large">Shop the Bakery</Button>
+              <Button size="large">Shop fresh borotho</Button>
             </LocalizedClientLink>
             <LocalizedClientLink href="/about">
               <Button size="large" variant="secondary">Our Story</Button>

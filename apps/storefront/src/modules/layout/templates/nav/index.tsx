@@ -34,7 +34,7 @@ export default async function Nav() {
               data-testid="nav-store-link"
             >
               <Image
-                src="/images/tshepo-face-and-bread-logo.jpeg"
+                src="/images/bread-logo.jpeg"
                 width={58}
                 height={58}
                 alt="Fakumoya Bakery"

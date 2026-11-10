@@ -16,11 +16,11 @@ export default async function Footer() {
         <div className="grid gap-12 py-16 small:grid-cols-[1.2fr_2fr] small:py-24">
           <div className="max-w-xs">
             <LocalizedClientLink href="/" className="flex items-center gap-3">
-              <Image src="/images/tshepo-face-and-bread-logo.jpeg" width={64} height={64} alt="Fakumoya Bakery" className="rounded-full border border-white/20" />
+              <Image src="/images/bread-logo.jpeg" width={64} height={64} alt="Fakumoya Bakery" className="rounded-full border border-white/20" />
               <span className="brand-heading text-2xl">Fakumoya Bakery</span>
             </LocalizedClientLink>
             <p className="brand-heading mt-6 text-3xl text-brand-accent">We are breadwinners.</p>
-            <p className="mt-3 text-sm leading-6 text-[#f3dfc0]">Freshly baked in Seshego, Polokwane. Established 2016.</p>
+            <p className="mt-3 text-sm leading-6 text-[#f3dfc0]">Freshly baked in Seshego, Polokwane. Borotho for the kasi since 2016.</p>
           </div>
           <div className="grid grid-cols-2 gap-10 text-sm small:grid-cols-4">
             {productCategories?.length > 0 && <div><h2 className="mb-4 font-semibold text-brand-accent">Categories</h2><ul className="grid gap-3">{productCategories.filter((c) => !c.parent_category_id).slice(0, 6).map((c) => <li key={c.id}><LocalizedClientLink className={linkClass} href={`/categories/${c.handle}`}>{c.name}</LocalizedClientLink></li>)}</ul></div>}

@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s | Fakumoya Bakery",
   },
   description:
-    "Freshly baked bread and bakery favourites from Seshego, Polokwane.",
+    "Freshly baked bread and kasi favourites from Seshego, Polokwane.",
   icons: {
     icon: "/images/tshepo-face-and-bread-logo.jpeg",
     apple: "/images/tshepo-face-and-bread-logo.jpeg",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Fakumoya Bakery",
     description:
-      "Freshly baked bread and bakery favourites from Seshego, Polokwane.",
+      "Freshly baked bread and kasi favourites from Seshego, Polokwane.",
     type: "website",
     images: [
       {

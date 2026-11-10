@@ -20,8 +20,8 @@ export async function generateMetadata(props: {
   const [origin, regions] = await Promise.all([getSiteOrigin(), listRegions()])
 
   return {
-    title: "Fresh bread from Seshego",
-    description: "Freshly baked bread and bakery favourites from Seshego, Polokwane.",
+    title: "Fresh borotho from Seshego",
+    description: "Freshly baked bread and kasi favourites from Seshego, Polokwane.",
     alternates: {
       canonical: `${origin}/${countryCode}`,
       languages: {
@@ -93,7 +93,7 @@ export default async function Home(props: {
       <section className="py-12 small:py-20" aria-labelledby="featured-heading">
         <div className="content-container mb-2">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-primary">From our ovens</p>
-          <h2 id="featured-heading" className="brand-heading mt-2 text-4xl text-brand-secondary small:text-5xl">Bakery favourites</h2>
+          <h2 id="featured-heading" className="brand-heading mt-2 text-4xl text-brand-secondary small:text-5xl">Kasi favourites</h2>
         </div>
         <ul className="flex flex-col gap-x-6">
           <FeaturedProducts collections={collections} region={region} />
@@ -115,7 +115,7 @@ export default async function Home(props: {
             <h2 className="brand-heading mt-4 text-5xl leading-tight small:text-6xl">We are breadwinners.</h2>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-[#f3dfc0]">
               Fakumoya Bakery is part of the rhythm of Seshego: warm loaves,
-              familiar favourites and good food made for the neighbourhood.
+              familiar favourites and good food made for the kasi.
             </p>
             <LocalizedClientLink href="/about" className="mt-8 inline-flex font-semibold text-brand-accent underline decoration-2 underline-offset-8">
               Read our story
