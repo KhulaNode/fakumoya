@@ -14,6 +14,12 @@ module.exports = defineConfig({
 
       return {
       ...config,
+      optimizeDeps: {
+        ...(config.optimizeDeps || {}),
+        // Prevent stale login chunks from the previous Admin dependency graph
+        // being served after a container rebuild.
+        force: true,
+      },
       plugins: [
         ...plugins,
         {
