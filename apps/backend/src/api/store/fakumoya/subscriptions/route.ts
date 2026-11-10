@@ -16,7 +16,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   const body = (req.body || {}) as SubscriptionInput
   const email = body.email?.trim().toLowerCase()
   if (!email) throw new MedusaError(MedusaError.Types.INVALID_DATA, "email is required")
-  const plan = process.env.PAYSTACK_MONTHLY_BREAD_PLAN_CODE
+  const plan = process.env.PAYSTACK_MONTHLY_BREAD_PLAN_CODE || process.env.PAYSTACK_PLAN_CODE
   const storefrontUrl = process.env.STOREFRONT_URL?.replace(/\/$/, "")
   if (!plan || !storefrontUrl) {
     throw new MedusaError(MedusaError.Types.UNEXPECTED_STATE, "Monthly subscription checkout is not configured")
