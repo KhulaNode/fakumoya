@@ -7,6 +7,8 @@ import { getRegion, listRegions } from "@lib/data/regions"
 import { toJsonLd } from "@lib/util/product-structured-data"
 import { getSiteOrigin, listCountryCodes, STORE_NAME } from "@lib/util/site"
 import { buildRegionsReturnPolicies } from "@lib/util/store-policies"
+import Image from "next/image"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export const dynamic = "force-static"
 export const revalidate = 60
@@ -18,9 +20,8 @@ export async function generateMetadata(props: {
   const [origin, regions] = await Promise.all([getSiteOrigin(), listRegions()])
 
   return {
-    title: "Medusa Next.js Starter Template",
-    description:
-      "A performant frontend ecommerce starter template with Next.js 16 and Medusa.",
+    title: "Fresh bread from Seshego",
+    description: "Freshly baked bread and bakery favourites from Seshego, Polokwane.",
     alternates: {
       canonical: `${origin}/${countryCode}`,
       languages: {
@@ -89,11 +90,39 @@ export default async function Home(props: {
         dangerouslySetInnerHTML={{ __html: toJsonLd(structuredData) }}
       />
       <Hero />
-      <div className="py-12">
+      <section className="py-12 small:py-20" aria-labelledby="featured-heading">
+        <div className="content-container mb-2">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-primary">From our ovens</p>
+          <h2 id="featured-heading" className="brand-heading mt-2 text-4xl text-brand-secondary small:text-5xl">Bakery favourites</h2>
+        </div>
         <ul className="flex flex-col gap-x-6">
           <FeaturedProducts collections={collections} region={region} />
         </ul>
-      </div>
+      </section>
+      <section className="bg-brand-secondary py-16 text-white small:py-24">
+        <div className="content-container grid items-center gap-10 small:grid-cols-[0.85fr_1.15fr]">
+          <div className="relative mx-auto aspect-square w-full max-w-md overflow-hidden rounded-[2rem] border border-white/20">
+            <Image
+              src="/images/tshepo-face-and-bread-logo.jpeg"
+              alt="Fakumoya Bakery heritage logo, established 2016"
+              fill
+              sizes="(max-width: 1024px) 90vw, 40vw"
+              className="object-cover"
+            />
+          </div>
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-accent">Proudly local since 2016</p>
+            <h2 className="brand-heading mt-4 text-5xl leading-tight small:text-6xl">We are breadwinners.</h2>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-[#f3dfc0]">
+              Fakumoya Bakery is part of the rhythm of Seshego: warm loaves,
+              familiar favourites and good food made for the neighbourhood.
+            </p>
+            <LocalizedClientLink href="/about" className="mt-8 inline-flex font-semibold text-brand-accent underline decoration-2 underline-offset-8">
+              Read our story
+            </LocalizedClientLink>
+          </div>
+        </div>
+      </section>
     </>
   )
 }

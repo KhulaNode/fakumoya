@@ -1,6 +1,6 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ChevronDown from "@modules/common/icons/chevron-down"
-import MedusaCTA from "@modules/layout/components/medusa-cta"
+import Image from "next/image"
 
 export default function CheckoutLayout({
   children,
@@ -8,8 +8,8 @@ export default function CheckoutLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="w-full bg-white relative small:min-h-screen">
-      <div className="h-16 bg-white border-b ">
+    <div className="w-full bg-brand-cream relative small:min-h-screen">
+      <div className="h-20 bg-brand-cream border-b border-brand-border">
         <nav className="flex h-full items-center content-container justify-between">
           <LocalizedClientLink
             href="/cart"
@@ -26,17 +26,18 @@ export default function CheckoutLayout({
           </LocalizedClientLink>
           <LocalizedClientLink
             href="/"
-            className="txt-compact-xlarge-plus text-ui-fg-subtle hover:text-ui-fg-base uppercase"
+            className="flex items-center gap-3 text-brand-secondary"
             data-testid="store-link"
           >
-            Medusa Store
+            <Image src="/images/tshepo-face-and-bread-logo.jpeg" width={48} height={48} alt="Fakumoya Bakery" className="rounded-full" />
+            <span className="brand-heading hidden small:block text-xl">Fakumoya Bakery</span>
           </LocalizedClientLink>
           <div className="flex-1 basis-0" />
         </nav>
       </div>
       <div className="relative" data-testid="checkout-container">{children}</div>
-      <div className="py-4 w-full flex items-center justify-center">
-        <MedusaCTA />
+      <div className="py-6 w-full flex items-center justify-center text-sm text-brand-secondary/70">
+        Secure checkout by Fakumoya Bakery
       </div>
     </div>
   )

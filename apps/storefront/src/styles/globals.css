@@ -2,6 +2,51 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+:root {
+  --brand-primary: #a96812;
+  --brand-primary-hover: #86500e;
+  --brand-secondary: #28180e;
+  --brand-accent: #d79530;
+  --background: #fff8ec;
+  --background-alt: #f3dfc0;
+  --surface: #ffffff;
+  --surface-warm: #faedd8;
+  --foreground: #28180e;
+  --text-secondary: #68503b;
+  --text-muted: #78634f;
+  --text-inverse: #ffffff;
+  --border: #e5cfad;
+  --input: #ffffff;
+  --ring: #a96812;
+  --button-primary: #28180e;
+  --button-primary-hover: #483020;
+  --button-accent: #a96812;
+  --button-accent-hover: #86500e;
+  --success: #276749;
+  --warning: #a96812;
+  --error: #b42318;
+  --radius: 0.75rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+::selection {
+  background: var(--brand-accent);
+  color: var(--brand-secondary);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+
 @layer utilities {
   /* Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
@@ -51,11 +96,31 @@
 
 @layer components {
   .content-container {
-    @apply max-w-[1440px] w-full mx-auto px-6;
+    @apply max-w-[1440px] w-full mx-auto px-5 small:px-8;
   }
 
   .contrast-btn {
-    @apply px-4 py-2 border border-black rounded-full hover:bg-black hover:text-white transition-colors duration-200 ease-in;
+    @apply px-4 py-2 rounded-full transition-colors duration-200 ease-in;
+    border: 1px solid var(--brand-secondary);
+    color: var(--brand-secondary);
+  }
+
+  .contrast-btn:hover {
+    background: var(--brand-secondary);
+    color: var(--text-inverse);
+  }
+
+  .brand-heading {
+    font-family: var(--font-serif), Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  .brand-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 12px 34px rgb(40 24 14 / 0.07);
   }
 
   .text-xsmall-regular {
