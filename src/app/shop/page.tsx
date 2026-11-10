@@ -1,3 +1,0 @@
-import { PRODUCTS, zar } from '@/lib/commerce';
-
-export default function Shop() { return <main className="section"><p className="eyebrow">THE BAKERY</p><h1>Shop fresh favourites.</h1><p className="lead">Prices are configured for the current catalogue and can be updated by bakery staff.</p><div className="product-grid">{PRODUCTS.map((product) => <article className="product-card" key={product.slug}><div className="image-placeholder">F</div><h2>{product.name}</h2><p>{product.category} · {product.unit}</p><strong>{zar(product.priceMinor)}</strong><button className="button" type="button">Add to cart</button></article>)}</div></main>; }
