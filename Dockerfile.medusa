@@ -11,9 +11,8 @@ COPY . .
 RUN npm run build --workspace=@dtc/backend
 
 FROM build AS runner
-WORKDIR /app
+WORKDIR /app/apps/backend/.medusa/server
 RUN ln -s /app/apps /apps
 ENV NODE_ENV=production
 EXPOSE 9000
-EXPOSE 5173
-CMD ["npm", "run", "dev", "--workspace=@dtc/backend"]
+CMD ["npm", "run", "start"]

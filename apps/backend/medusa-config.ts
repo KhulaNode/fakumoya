@@ -4,24 +4,10 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
 module.exports = defineConfig({
   admin: {
-    vite: (config) => {
-      const plugins = (config.plugins || []).filter((plugin: any, index: number, all: any[]) => {
-        // Medusa can invoke this callback more than once in development. Keep
-        // one instance of each named Vite plugin so React Refresh is injected
-        // only once into custom Admin routes.
-        return Boolean(plugin?.name) && index === all.findIndex((candidate) => candidate?.name === plugin?.name)
-      })
-
-      return {
-      ...config,
-      optimizeDeps: {
-        ...(config.optimizeDeps || {}),
-        // Prevent stale login chunks from the previous Admin dependency graph
-        // being served after a container rebuild.
-        force: true,
-      },
+    // Medusa merges this return value with its Vite defaults. Return only our
+    // additions; returning the supplied config duplicates its React plugin.
+    vite: () => ({
       plugins: [
-        ...plugins,
         {
           name: 'fakumoya-admin-branding',
           transformIndexHtml() {
@@ -80,17 +66,7 @@ module.exports = defineConfig({
           },
         },
       ],
-      server: {
-        ...config.server,
-        host: '0.0.0.0',
-        allowedHosts: ['localhost', '.localhost', '127.0.0.1'],
-        // Medusa's Admin bundler currently injects React Refresh twice for
-        // custom TSX routes in this setup. Disable dev HMR until that upstream
-        // collision is resolved; the Admin itself remains available on 9000.
-        hmr: false,
-      },
-      }
-    },
+    }),
   },
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,

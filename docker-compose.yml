@@ -47,6 +47,11 @@ services:
     command: [npm, run, dev]
     env_file:
       - apps/backend/.env
+    environment:
+      HMR_PORT: "5173"
+      HMR_BIND_HOST: 0.0.0.0
+      HMR_HOST: localhost
+      HMR_CLIENT_PORT: "5173"
     depends_on:
       medusa-migrate: { condition: service_completed_successfully }
       redis: { condition: service_healthy }
