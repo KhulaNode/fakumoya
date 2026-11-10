@@ -4,10 +4,18 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
 module.exports = defineConfig({
   admin: {
-    vite: (config) => ({
+    vite: (config) => {
+      const plugins = (config.plugins || []).filter((plugin: any, index: number, all: any[]) => {
+        // Medusa can invoke this callback more than once in development. Keep
+        // one instance of each named Vite plugin so React Refresh is injected
+        // only once into custom Admin routes.
+        return index === all.findIndex((candidate) => candidate?.name === plugin?.name)
+      })
+
+      return {
       ...config,
       plugins: [
-        ...(config.plugins || []),
+        ...plugins,
         {
           name: 'fakumoya-admin-branding',
           transformIndexHtml() {
@@ -75,7 +83,8 @@ module.exports = defineConfig({
           clientPort: 5173,
         },
       },
-    }),
+      }
+    },
   },
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
