@@ -47,7 +47,7 @@ export default async function Nav() {
             </LocalizedClientLink>
           </div>
 
-          <div className="hidden small:flex items-center gap-x-6 h-full flex-1 justify-center">
+          <div className="hidden small:flex items-center gap-x-4 medium:gap-x-6 h-full flex-1 justify-center">
             <LocalizedClientLink className="hover:text-brand-primary" href="/">
               Home
             </LocalizedClientLink>
@@ -56,6 +56,12 @@ export default async function Nav() {
             </LocalizedClientLink>
             <LocalizedClientLink className="hover:text-brand-primary" href="/about">
               Our Story
+            </LocalizedClientLink>
+            <LocalizedClientLink
+              className="whitespace-nowrap hover:text-brand-primary"
+              href="/subscriptions"
+            >
+              Fresh Bread Subscription
             </LocalizedClientLink>
           </div>
 

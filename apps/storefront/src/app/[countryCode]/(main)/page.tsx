@@ -7,6 +7,7 @@ import { getRegion, listRegions } from "@lib/data/regions"
 import { toJsonLd } from "@lib/util/product-structured-data"
 import { getSiteOrigin, listCountryCodes, STORE_NAME } from "@lib/util/site"
 import { buildRegionsReturnPolicies } from "@lib/util/store-policies"
+import { Button } from "@modules/common/components/ui"
 import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
@@ -98,6 +99,36 @@ export default async function Home(props: {
         <ul className="flex flex-col gap-x-6">
           <FeaturedProducts collections={collections} region={region} />
         </ul>
+      </section>
+      <section
+        className="border-y border-brand-border bg-brand-parchment py-14 small:py-20"
+        aria-labelledby="subscription-heading"
+      >
+        <div className="content-container flex flex-col items-start justify-between gap-8 small:flex-row small:items-center">
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-primary">
+              Fresh from our ovens
+            </p>
+            <h2
+              id="subscription-heading"
+              className="brand-heading mt-3 text-4xl leading-tight text-brand-secondary small:text-5xl"
+            >
+              Fresh Bread, Delivered Regularly.
+            </h2>
+            <p className="mt-4 max-w-xl text-lg leading-8 text-[#68503b]">
+              Enjoy freshly baked Fakumoya bread delivered to your doorstep
+              three times a week with our convenient monthly subscription.
+            </p>
+          </div>
+          <LocalizedClientLink
+            href="/subscriptions"
+            className="w-full small:w-auto"
+          >
+            <Button size="large" className="w-full small:w-auto">
+              Subscribe to Fresh Bread
+            </Button>
+          </LocalizedClientLink>
+        </div>
       </section>
       <section className="bg-brand-secondary py-16 text-white small:py-24">
         <div className="content-container grid items-center gap-10 small:grid-cols-[0.85fr_1.15fr]">
