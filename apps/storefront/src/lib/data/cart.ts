@@ -11,6 +11,7 @@ import {
   getCacheTag,
   getCartId,
   removeCartId,
+  setCompletedOrderId,
   setCartId,
 } from "./cookies"
 import { getRegion } from "./regions"
@@ -50,6 +51,78 @@ export async function retrieveCart(cartId?: string, fields?: string) {
     })
     .then(({ cart }: { cart: HttpTypes.StoreCart }) => cart)
     .catch(() => null)
+}
+
+type StoreOrderLookupResponse = {
+  order?: HttpTypes.StoreOrder
+  orders?: HttpTypes.StoreOrder[]
+}
+
+const paymentOrderFields =
+  "*payment_collections.payments,*items,*items.metadata,*items.variant,*items.product"
+
+/** Retrieves the order Medusa created for a completed cart, without cache. */
+export async function retrieveOrderByCartId(cartId: string) {
+  if (!cartId) {
+    return null
+  }
+
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  return sdk.client
+    .fetch<StoreOrderLookupResponse>(
+      `/store/fakumoya/paystack/order/${encodeURIComponent(cartId)}`,
+      {
+        method: "GET",
+        query: { fields: paymentOrderFields },
+        headers,
+        cache: "no-store",
+      }
+    )
+    .then(({ order, orders }) => order || orders?.[0] || null)
+    .catch(() => null)
+}
+
+/** Retrieves a previously confirmed order for an idempotent callback retry. */
+export async function retrieveOrderForPayment(orderId: string) {
+  if (!orderId) {
+    return null
+  }
+
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  return sdk.client
+    .fetch<HttpTypes.StoreOrderResponse>(
+      `/store/orders/${encodeURIComponent(orderId)}`,
+      {
+        method: "GET",
+        query: { fields: paymentOrderFields },
+        headers,
+        cache: "no-store",
+      }
+    )
+    .then(({ order }) => order || null)
+    .catch(() => null)
+}
+
+/** Invalidates the cart and remembers the confirmed order for duplicate callbacks. */
+export async function clearCartAfterOrder(orderId: string) {
+  const cartCacheTag = await getCacheTag("carts")
+  if (cartCacheTag) {
+    revalidateTag(cartCacheTag, { expire: 0 })
+  }
+
+  const orderCacheTag = await getCacheTag("orders")
+  if (orderCacheTag) {
+    revalidateTag(orderCacheTag, { expire: 0 })
+  }
+
+  await setCompletedOrderId(orderId)
+  await removeCartId()
 }
 
 export async function getOrSetCart(countryCode: string) {
@@ -451,7 +524,7 @@ export async function placeOrder(cartId?: string) {
     const orderCacheTag = await getCacheTag("orders")
     revalidateTag(orderCacheTag, { expire: 0 })
 
-    removeCartId()
+    await removeCartId()
     redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`)
   }
 

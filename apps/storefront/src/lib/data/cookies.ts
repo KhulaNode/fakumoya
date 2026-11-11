@@ -120,6 +120,28 @@ export const getCartId = async () => {
   return cookies.get("_medusa_cart_id")?.value
 }
 
+const COMPLETED_ORDER_COOKIE = "_medusa_completed_order_id"
+
+/**
+ * Keeps the last confirmed order available for a short time so a repeated
+ * payment-provider callback can remain idempotent after the cart cookie has
+ * already been cleared.
+ */
+export const getCompletedOrderId = async () => {
+  const cookies = await nextCookies()
+  return cookies.get(COMPLETED_ORDER_COOKIE)?.value
+}
+
+export const setCompletedOrderId = async (orderId: string) => {
+  const cookies = await nextCookies()
+  cookies.set(COMPLETED_ORDER_COOKIE, orderId, {
+    maxAge: 60 * 15,
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+  })
+}
+
 // See the note on `setAuthToken`: `sameSite: "lax"` so the cart cookie survives
 // the cross-site return navigation from a redirect-based payment method.
 export const setCartId = async (cartId: string) => {
