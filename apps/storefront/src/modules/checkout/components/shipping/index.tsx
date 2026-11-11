@@ -152,7 +152,7 @@ const Shipping: React.FC<ShippingProps> = ({
   }, [isOpen])
 
   return (
-    <div className="bg-white">
+    <div className="checkout-step brand-card p-5 small:p-7">
       <div className="flex flex-row items-center justify-between mb-6">
         <Heading
           level="h2"

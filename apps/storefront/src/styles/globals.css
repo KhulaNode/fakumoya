@@ -123,6 +123,35 @@ body {
     box-shadow: 0 12px 34px rgb(40 24 14 / 0.07);
   }
 
+  .checkout-shell {
+    align-items: start;
+  }
+
+  .checkout-step h2,
+  .checkout-summary h2 {
+    font-family: var(--font-serif), Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    color: var(--brand-secondary);
+  }
+
+  .checkout-step h2 svg {
+    color: var(--brand-primary);
+    width: 18px;
+    height: 18px;
+  }
+
+  .checkout-summary {
+    box-shadow: 0 16px 36px rgb(40 24 14 / 0.1);
+  }
+
+  @media (max-width: 639px) {
+    .checkout-shell {
+      padding-top: 1.25rem;
+      padding-bottom: 1.25rem;
+    }
+  }
+
   .text-xsmall-regular {
     @apply text-[10px] leading-4 font-normal;
   }

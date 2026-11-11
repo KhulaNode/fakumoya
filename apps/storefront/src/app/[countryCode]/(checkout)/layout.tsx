@@ -9,7 +9,7 @@ export default function CheckoutLayout({
 }) {
   return (
     <div className="w-full bg-brand-cream relative small:min-h-screen">
-      <div className="h-20 bg-brand-cream border-b border-brand-border">
+      <div className="h-[76px] bg-brand-cream border-b border-brand-border shadow-[0_1px_0_rgba(40,24,14,0.04)]">
         <nav className="flex h-full items-center content-container justify-between">
           <LocalizedClientLink
             href="/cart"
@@ -29,8 +29,8 @@ export default function CheckoutLayout({
             className="flex items-center gap-3 text-brand-secondary"
             data-testid="store-link"
           >
-            <Image src="/images/tshepo-face-and-bread-logo.jpeg" width={48} height={48} alt="Fakumoya Bakery" className="rounded-full" />
-            <span className="brand-heading hidden small:block text-xl">Fakumoya Bakery</span>
+            <Image src="/images/bread-logo.jpeg" width={52} height={52} alt="Fakumoya Bakery" className="rounded-full object-cover ring-2 ring-brand-border ring-offset-2 ring-offset-brand-cream" />
+            <span className="brand-heading hidden small:block text-xl tracking-tight">Fakumoya Bakery</span>
           </LocalizedClientLink>
           <div className="flex-1 basis-0" />
         </nav>
