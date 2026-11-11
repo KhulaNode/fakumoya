@@ -61,6 +61,8 @@ services:
       retries: 10
       start_period: 20s
     restart: unless-stopped
+    volumes:
+      - fakumoya-uploads:/app/apps/backend/.medusa/server/static
 
   storefront:
     build:
@@ -88,3 +90,4 @@ services:
 volumes:
   fakumoya-medusa-postgres-v2:
   fakumoya-redis:
+  fakumoya-uploads:
