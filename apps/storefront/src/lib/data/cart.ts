@@ -11,7 +11,6 @@ import {
   getCacheTag,
   getCartId,
   removeCartId,
-  setCompletedOrderId,
   setCartId,
 } from "./cookies"
 import { getRegion } from "./regions"
@@ -82,7 +81,6 @@ export async function retrieveOrderByCartId(cartId: string) {
       }
     )
     .then(({ order, orders }) => order || orders?.[0] || null)
-    .catch(() => null)
 }
 
 /** Retrieves a previously confirmed order for an idempotent callback retry. */
@@ -106,11 +104,10 @@ export async function retrieveOrderForPayment(orderId: string) {
       }
     )
     .then(({ order }) => order || null)
-    .catch(() => null)
 }
 
-/** Invalidates the cart and remembers the confirmed order for duplicate callbacks. */
-export async function clearCartAfterOrder(orderId: string) {
+/** Invalidates cached cart/order data after a confirmed payment. */
+export async function invalidateCartAfterOrder() {
   const cartCacheTag = await getCacheTag("carts")
   if (cartCacheTag) {
     revalidateTag(cartCacheTag, { expire: 0 })
@@ -120,9 +117,6 @@ export async function clearCartAfterOrder(orderId: string) {
   if (orderCacheTag) {
     revalidateTag(orderCacheTag, { expire: 0 })
   }
-
-  await setCompletedOrderId(orderId)
-  await removeCartId()
 }
 
 export async function getOrSetCart(countryCode: string) {

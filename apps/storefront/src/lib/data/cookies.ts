@@ -1,5 +1,11 @@
 import "server-only"
 import { cookies as nextCookies } from "next/headers"
+import {
+  MEDUSA_CART_ID_COOKIE,
+  MEDUSA_COMPLETED_ORDER_COOKIE,
+} from "../paystack-return"
+
+export { setPaymentCompletionCookies } from "../paystack-return"
 
 export const getAuthHeaders = async (): Promise<
   { authorization: string } | Record<string, never>
@@ -117,10 +123,8 @@ export const removePendingCustomer = async () => {
 
 export const getCartId = async () => {
   const cookies = await nextCookies()
-  return cookies.get("_medusa_cart_id")?.value
+  return cookies.get(MEDUSA_CART_ID_COOKIE)?.value
 }
-
-const COMPLETED_ORDER_COOKIE = "_medusa_completed_order_id"
 
 /**
  * Keeps the last confirmed order available for a short time so a repeated
@@ -129,34 +133,29 @@ const COMPLETED_ORDER_COOKIE = "_medusa_completed_order_id"
  */
 export const getCompletedOrderId = async () => {
   const cookies = await nextCookies()
-  return cookies.get(COMPLETED_ORDER_COOKIE)?.value
-}
-
-export const setCompletedOrderId = async (orderId: string) => {
-  const cookies = await nextCookies()
-  cookies.set(COMPLETED_ORDER_COOKIE, orderId, {
-    maxAge: 60 * 15,
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-  })
+  return cookies.get(MEDUSA_COMPLETED_ORDER_COOKIE)?.value
 }
 
 // See the note on `setAuthToken`: `sameSite: "lax"` so the cart cookie survives
 // the cross-site return navigation from a redirect-based payment method.
 export const setCartId = async (cartId: string) => {
   const cookies = await nextCookies()
-  cookies.set("_medusa_cart_id", cartId, {
+  cookies.set(MEDUSA_CART_ID_COOKIE, cartId, {
     maxAge: 60 * 60 * 24 * 7,
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
+    path: "/",
   })
 }
 
 export const removeCartId = async () => {
   const cookies = await nextCookies()
-  cookies.set("_medusa_cart_id", "", {
-    maxAge: -1,
+  cookies.set(MEDUSA_CART_ID_COOKIE, "", {
+    maxAge: 0,
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
   })
 }

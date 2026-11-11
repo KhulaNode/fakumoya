@@ -1,81 +1,84 @@
 import {
-  clearCartAfterOrder,
+  invalidateCartAfterOrder,
   retrieveOrderByCartId,
   retrieveOrderForPayment,
 } from "@lib/data/cart"
-import { getCartId, getCompletedOrderId } from "@lib/data/cookies"
-import { HttpTypes } from "@medusajs/types"
+import {
+  getCartId,
+  getCompletedOrderId,
+  setPaymentCompletionCookies,
+} from "@lib/data/cookies"
+import { resolvePaystackPayment } from "@lib/paystack-return"
+import type { PaymentResolution } from "@lib/paystack-return"
+import type { HttpTypes } from "@medusajs/types"
 import { NextRequest, NextResponse } from "next/server"
 
-const PAYSTACK_PROVIDER_ID = "pp_paystack_paystack"
 const SERVER_ATTEMPTS = 3
 const SERVER_RETRY_DELAY_MS = 750
 
-type PaymentResolution =
-  | { status: "captured"; order: HttpTypes.StoreOrder }
-  | { status: "processing" }
-  | { status: "failed"; reason: string }
-  | { status: "error"; reason: string }
-
 const wait = (milliseconds: number) =>
-  new Promise((resolve) => setTimeout(resolve, milliseconds))
+  new Promise<void>((resolve) => setTimeout(resolve, milliseconds))
 
-const hasCapturedPaystackPayment = (order: HttpTypes.StoreOrder) => {
-  const paymentCollections = (order as any).payment_collections || []
-  const payments = paymentCollections.flatMap(
-    (collection: any) => collection.payments || []
-  )
+const safeErrorMessage = (error: unknown) => {
+  const record =
+    typeof error === "object" && error !== null
+      ? (error as Record<string, unknown>)
+      : undefined
+  const message =
+    error instanceof Error
+      ? error.message
+      : typeof record?.message === "string"
+      ? record.message
+      : "Unknown Medusa order lookup error"
 
-  return (
-    order.payment_status === "captured" &&
-    payments.some(
-      (payment: any) => payment.provider_id === PAYSTACK_PROVIDER_ID
+  return message
+    .replace(
+      /(authorization|cookie|token|secret|password)[^\s]*/gi,
+      "$1=[redacted]"
     )
-  )
+    .slice(0, 200)
 }
 
-const isFailedPaymentStatus = (status?: string | null) =>
-  ["canceled", "cancelled", "failed", "not_paid", "refunded"].includes(
-    status || ""
-  )
+const logLookupError = (
+  operation: string,
+  identifier: string,
+  error: unknown
+) => {
+  const record =
+    typeof error === "object" && error !== null
+      ? (error as Record<string, unknown>)
+      : undefined
+  const status =
+    typeof record?.status === "number" || typeof record?.status === "string"
+      ? record.status
+      : undefined
 
-const resolvePayment = async (attempts: number): Promise<PaymentResolution> => {
+  console.error("[paystack-return] Medusa order lookup failed", {
+    operation,
+    identifier_prefix: identifier.slice(0, 8),
+    status,
+    message: safeErrorMessage(error),
+  })
+}
+
+const resolvePayment = async (
+  attempts: number
+): Promise<PaymentResolution<HttpTypes.StoreOrder>> => {
   const cartId = await getCartId()
 
-  if (cartId) {
-    for (let attempt = 0; attempt < attempts; attempt += 1) {
-      const order = await retrieveOrderByCartId(cartId)
-
-      if (order && hasCapturedPaystackPayment(order)) {
-        return { status: "captured", order }
-      }
-
-      if (order && isFailedPaymentStatus(order.payment_status)) {
-        return { status: "failed", reason: "payment_failed" }
-      }
-
-      if (attempt < attempts - 1) {
-        await wait(SERVER_RETRY_DELAY_MS)
-      }
-    }
-
-    return { status: "processing" }
-  }
-
-  // Paystack can retry the browser callback after the first response has
-  // already cleared the cart cookie. Verify the remembered order again rather
-  // than ever treating the callback itself as proof of payment.
   const completedOrderId = await getCompletedOrderId()
-  if (!completedOrderId) {
-    return { status: "error", reason: "missing_cart" }
-  }
 
-  const order = await retrieveOrderForPayment(completedOrderId)
-  if (order && hasCapturedPaystackPayment(order)) {
-    return { status: "captured", order }
-  }
-
-  return { status: "error", reason: "order_not_confirmed" }
+  return resolvePaystackPayment({
+    cartId,
+    completedOrderId,
+    attempts,
+    lookupOrderByCartId: retrieveOrderByCartId,
+    lookupOrderById: retrieveOrderForPayment,
+    delay: wait,
+    retryDelayMs: SERVER_RETRY_DELAY_MS,
+    onLookupError: (operation, identifier, error) =>
+      logLookupError(operation, identifier, error),
+  })
 }
 
 const getBaseUrl = (request: NextRequest) =>
@@ -94,7 +97,10 @@ const getOrderUrl = (baseUrl: string, order: HttpTypes.StoreOrder) =>
     baseUrl
   ).toString()
 
-const getStatusResponse = (resolution: PaymentResolution, baseUrl: string) => {
+const getStatusResponse = (
+  resolution: PaymentResolution<HttpTypes.StoreOrder>,
+  baseUrl: string
+) => {
   if (resolution.status === "captured") {
     return {
       status: "complete",
@@ -102,8 +108,13 @@ const getStatusResponse = (resolution: PaymentResolution, baseUrl: string) => {
     }
   }
 
+  const status =
+    resolution.status === "error" && resolution.reason === "lookup_unavailable"
+      ? "processing"
+      : resolution.status
+
   return {
-    status: resolution.status,
+    status,
     reason: "reason" in resolution ? resolution.reason : undefined,
   }
 }
@@ -114,7 +125,21 @@ export async function GET(request: NextRequest) {
   const resolution = await resolvePayment(isPoll ? 1 : SERVER_ATTEMPTS)
 
   if (resolution.status === "captured") {
-    await clearCartAfterOrder(resolution.order.id)
+    await invalidateCartAfterOrder()
+
+    if (isPoll) {
+      return setPaymentCompletionCookies(
+        NextResponse.json(getStatusResponse(resolution, baseUrl), {
+          headers: { "cache-control": "no-store" },
+        }),
+        resolution.order.id
+      )
+    }
+
+    return setPaymentCompletionCookies(
+      NextResponse.redirect(getOrderUrl(baseUrl, resolution.order)),
+      resolution.order.id
+    )
   }
 
   if (isPoll) {
@@ -123,15 +148,18 @@ export async function GET(request: NextRequest) {
     })
   }
 
-  if (resolution.status === "captured") {
-    return NextResponse.redirect(getOrderUrl(baseUrl, resolution.order))
-  }
-
   const url = new URL("/", baseUrl)
-  url.searchParams.set(
-    "payment",
-    resolution.status === "failed" ? "failed" : resolution.status
-  )
+  const paymentState =
+    resolution.status === "failed"
+      ? "failed"
+      : resolution.status === "processing" ||
+        (resolution.status === "error" &&
+          resolution.reason === "lookup_unavailable")
+      ? "processing"
+      : "error"
+  url.searchParams.set("payment", paymentState)
 
-  return NextResponse.redirect(url)
+  const response = NextResponse.redirect(url)
+  response.headers.set("cache-control", "no-store")
+  return response
 }
