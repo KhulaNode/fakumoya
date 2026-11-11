@@ -30,6 +30,29 @@ test("recognises a captured Paystack order returned through the cart lookup", as
   assert.deepEqual(resolution.order, capturedOrder)
 })
 
+test("recognises the persisted Paystack capture when Graph Query omits payment_status", async () => {
+  const resolution = await resolvePaystackPayment({
+    cartId: "cart_123",
+    attempts: 1,
+    lookupOrderByCartId: async () => ({
+      id: "order_123",
+      payment_collections: [
+        {
+          payments: [
+            {
+              provider_id: PAYSTACK_PROVIDER_ID,
+              captured_at: "2026-11-11T16:00:00.000Z",
+            },
+          ],
+        },
+      ],
+    }),
+    lookupOrderById: async () => null,
+  })
+
+  assert.equal(resolution.status, "captured")
+})
+
 test("keeps a missing cart order in the bounded pending state", async () => {
   const resolution = await resolvePaystackPayment({
     cartId: "cart_123",

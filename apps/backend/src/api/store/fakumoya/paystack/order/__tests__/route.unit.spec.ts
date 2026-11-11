@@ -16,30 +16,39 @@ const makeResponse = () => {
 };
 
 describe("Paystack cart order lookup", () => {
-  it("returns the order linked through Medusa's Cart -> Order graph", async () => {
+  it("returns the order linked through Medusa's persistent OrderCart graph", async () => {
     const order = {
       id: "order_123",
       payment_status: "captured",
       payment_collections: [
-        { payments: [{ provider_id: "pp_paystack_paystack" }] },
+        {
+          payments: [
+            {
+              provider_id: "pp_paystack_paystack",
+              captured_at: "2026-11-11T16:00:00.000Z",
+            },
+          ],
+        },
       ],
     };
     const query = {
-      graph: jest.fn().mockResolvedValue({ data: [{ id: "cart_123", order }] }),
+      graph: jest.fn().mockResolvedValue({
+        data: [{ id: "ordercart_123", cart_id: "cart_123", order: [order] }],
+      }),
     };
     const response = makeResponse();
 
     await GET(makeRequest("cart_123", query), response);
 
     expect(query.graph).toHaveBeenCalledWith({
-      entity: "cart",
+      entity: "order_cart",
       fields: expect.arrayContaining([
         "order.id",
-        "order.payment_status",
         "order.payment_collections.id",
         "order.payment_collections.payments.provider_id",
+        "order.payment_collections.payments.captured_at",
       ]),
-      filters: { id: "cart_123" },
+      filters: { cart_id: "cart_123" },
     });
     expect(response.json).toHaveBeenCalledWith({ order });
   });
@@ -65,7 +74,7 @@ describe("Paystack cart order lookup", () => {
       GET(makeRequest("cart_123456", query), response)
     ).rejects.toThrow("database unavailable");
     expect(log).toHaveBeenCalledWith(
-      "[paystack-order-lookup] Cart -> Order query failed",
+      "[paystack-order-lookup] OrderCart query failed",
       expect.objectContaining({ cart_id_prefix: "cart_123" })
     );
 

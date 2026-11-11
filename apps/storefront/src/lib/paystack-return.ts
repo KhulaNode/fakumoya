@@ -7,6 +7,7 @@ export const COMPLETED_ORDER_COOKIE_MAX_AGE = 60 * 15
 
 type PaystackPayment = {
   provider_id?: string | null
+  captured_at?: string | Date | null
 }
 
 type PaystackPaymentCollection = {
@@ -30,15 +31,21 @@ const asArray = <T>(value: T | T[] | null | undefined): T[] =>
  * Medusa normally returns payment_collections and payments as arrays. The
  * Cart -> Order graph can also be represented as a single linked object, so
  * normalize both forms before checking the captured Paystack payment.
+ *
+ * `payment_status` is a Store API presentation field, not a persisted Order
+ * model field. A direct Graph Query can therefore omit it. `captured_at` on
+ * the provider payment is the durable capture record written by Medusa's
+ * payment workflow and is the only fallback accepted here.
  */
 export const hasCapturedPaystackPayment = (order: PaystackPaymentOrder) => {
   const payments = asArray(order.payment_collections).flatMap((collection) =>
     asArray(collection.payments)
   )
 
-  return (
-    order.payment_status === "captured" &&
-    payments.some((payment) => payment.provider_id === PAYSTACK_PROVIDER_ID)
+  return payments.some(
+    (payment) =>
+      payment.provider_id === PAYSTACK_PROVIDER_ID &&
+      (order.payment_status === "captured" || Boolean(payment.captured_at))
   )
 }
 
