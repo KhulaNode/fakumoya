@@ -16,8 +16,11 @@ type Props = {
   params: Promise<{ countryCode: string; handle: string }>
 }
 
-export const dynamic = "force-static"
-export const revalidate = 60
+// Product options and variants are maintained in Medusa Admin. Keep the
+// detail page request fresh so an Admin update is visible without waiting for
+// a Next.js page or fetch cache to expire.
+export const dynamic = "force-dynamic"
+export const revalidate = 0
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
@@ -31,6 +34,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const product = await listProducts({
     countryCode: params.countryCode,
     queryParams: { handle },
+    cache: "no-store",
   }).then(({ response }) => response.products[0])
 
   if (!product) {
@@ -114,6 +118,7 @@ export default async function ProductPage(props: Props) {
   const pricedProduct = await listProducts({
     countryCode: params.countryCode,
     queryParams: { handle: params.handle },
+    cache: "no-store",
   }).then(({ response }) => response.products[0])
 
   if (!pricedProduct) {
