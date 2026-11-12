@@ -85,7 +85,7 @@ const StoreHits = ({ hitsPerPage, currencyCode }: StoreHitsProps) => {
                 >
                   <div data-testid="product-wrapper">
                     <Thumbnail thumbnail={hit.thumbnail} size="full" />
-                    <div className="flex txt-compact-medium mt-4 justify-between">
+                    <div className="flex flex-col txt-compact-medium mt-4">
                       <Text
                         className="text-ui-fg-subtle"
                         data-testid="product-title"

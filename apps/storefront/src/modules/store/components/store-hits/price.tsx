@@ -49,7 +49,7 @@ const HitPrice = ({ hit, currencyCode }: HitPriceProps) => {
         })}
         data-testid="price"
       >
-        {isRange ? `${format(min_price)} - ${format(max)}` : format(min_price)}
+        {isRange ? `From ${format(min_price)}` : format(min_price)}
       </Text>
     </div>
   )
